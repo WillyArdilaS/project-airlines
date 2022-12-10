@@ -1,8 +1,46 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { ConnectionForm } from "./ConnectionForm";
+import axios from 'axios';
 
-export const SegmentForm = ({marginLeft, segmentNumber}) => {
+export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline}) => {
     const [connectionCreated, SetConnectionCreated] = useState(false);
+    const [actualAirport,setActualAirport]= useState("")
+    const [segmentAirports, setSegmentAirports] = useState([]);
+
+    useEffect(() => {
+        if (airlines.length != 0) {
+            axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_idPlace', { params: { airlineCode: lastAirline } })
+                .then((res) => {
+                    let codePlace = res.data.idPlace[0]
+                    axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/paisFK_idPlace', { params: { pais: codePlace } })
+                        .then((res) => {
+                            let division = res.data.idPlace
+                            setSegmentAirports([])
+
+                            division.map((item) => {
+                                axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/idPlace_aiportName', { params: { idPlaceAirport: item } })
+                                    .then((res) => {
+
+                                        setSegmentAirports(dataElement => [...dataElement, res.data.nameAirport[0]])
+                                        
+                                    })
+                                    .catch((error) => {
+                                        console.log(error)
+                                    })
+                            })
+                        })
+
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                })
+
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
+
+    }, [airlineCode])
 
     const handleCreateConnection = () => {
         SetConnectionCreated(true);
@@ -12,6 +50,7 @@ export const SegmentForm = ({marginLeft, segmentNumber}) => {
         SetConnectionCreated(false);
     }
 
+
     return (
         <div className={`w-1/5 ${marginLeft}`}>
             <article className="w-full"> 
@@ -20,9 +59,16 @@ export const SegmentForm = ({marginLeft, segmentNumber}) => {
                 <form className="flex flex-col mt-4 px-3 py-6 border-x-4 border-y-4 border-black">
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="airportInput"> Aeropuerto </label>
-                        <select name="airportInput" id="airportInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required>
-                            <option value=""> 1 </option>
-                            <option value=""> 2 </option>
+                        <select name="airportInput" id="airportInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" onChange={(e)=>setActualAirport(e.target.value)} required>
+                            <option value="nothing"></option>
+
+                            {
+                                segmentAirports.map((element, index) => {
+                                    return (<option key={index} value={element}>{element}</option>)
+                                })
+                            }
+
+
                         </select>
                     </div>
 
@@ -53,7 +99,7 @@ export const SegmentForm = ({marginLeft, segmentNumber}) => {
                 </form>
             </article>
 
-            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} /> : false}
+            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline}/> : false}
         </div>
     );
 }

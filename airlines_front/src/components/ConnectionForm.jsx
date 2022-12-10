@@ -1,4 +1,48 @@
-export const ConnectionForm = ({segmentNumber}) => {
+import { useState, useEffect } from "react";
+import axios from 'axios';
+
+export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirport,setLastAirline}) => {
+    const [flightNumber, setFlightNumber] = useState('')
+    const [airlineCodeConnection, setAirlineCodeConnection] = useState('')
+    
+
+    useEffect(() => {
+        console.log(airlineCode)
+        console.log(airlineCodeConnection)
+
+        if (airlineCode == airlineCodeConnection) {
+            let newFlightNumber = parseInt(flightNumber)+1
+                setFlightNumber(newFlightNumber.toString())
+                console.log(flightNumber)
+        } 
+
+
+    }, [airlineCodeConnection])
+
+   
+
+
+
+    const handleFlight = (e) => {
+        axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
+            .then((res) => {
+                let code = res.data.airlineCode
+                axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_flightNumber', { params: { airlineCode: code } })
+                    .then((res) => {
+                        setAirlineCodeConnection(code)
+                        setLastAirline(code)
+                        let parse = parseInt(res.data.flightNumber) + 1
+                        setFlightNumber(parse.toString())
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
     return (
         <article className="w-full mt-16">
             <h1 className="-mt-11 text-lg text-black text-center font-bold"> Conexión #{segmentNumber} </h1>
@@ -6,24 +50,27 @@ export const ConnectionForm = ({segmentNumber}) => {
             <form className="flex flex-col mt-4 px-3 py-6 border-x-4 border-y-4 border-black">
                 <div className='w-full flex justify-between mb-10'>
                     <label htmlFor="airline-select"> Aerolínea </label>
-                    <select name="airline-select" id="airline-select" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required>
-                        <option value=""> 1 </option>
-                        <option value=""> 2 </option>
+                    <select name="airlineInput" id="airlineInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" onChange={handleFlight} required>
+                        <option value="nothing"></option>
+                        {
+                            airlines.map((element, index) => {
+                                return (<option key={index} value={element}>{element}</option>)
+                            })
+                        }
+
+
                     </select>
                 </div>
 
                 <div className="w-full flex justify-between mb-10">
                     <label htmlFor="flight-number"> N° de vuelo </label>
-                    <input type="text" name="" id="" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required/>
+                    <input type="text" name="flight-number" id="flight-number" value={flightNumber} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                 </div>
 
-                <div className='w-full flex justify-between'>
+                <div className="w-full flex justify-between mb-10">
                     <label htmlFor="airport-select"> Aeropuerto </label>
-                    <select name="airport-select" id="airport-select" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required>
-                        <option value=""> 1 </option>
-                        <option value=""> 2 </option>
-                    </select>
-                </div>     
+                    <input type="text" name="airport-select" id="airport-select" value={actualAirport} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
+                </div>
             </form>
         </article>
     );
