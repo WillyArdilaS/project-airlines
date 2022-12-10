@@ -1,11 +1,14 @@
 import { useState,useEffect } from "react";
 import { ConnectionForm } from "./ConnectionForm";
-import axios from 'axios';
+import axios, { Axios, AxiosError } from 'axios';
 
 export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline}) => {
     const [connectionCreated, SetConnectionCreated] = useState(false);
     const [actualAirport,setActualAirport]= useState("")
     const [segmentAirports, setSegmentAirports] = useState([]);
+    const [division, setDivision] = useState("")
+    const [country, setCountry] = useState("")
+    const [city, setCity] = useState("")
 
     useEffect(() => {
         if (airlines.length != 0) {
@@ -50,41 +53,75 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
         SetConnectionCreated(false);
     }
 
+    const handleAirport =(e)=>{
+        setActualAirport(e.target.value)
+        axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/aiportName_airport',{params:{airportName: e.target.value}})
+        .then((res)=>{
+            let divisionCode =res.data.aiports[0]
+            axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/id_place',{params:{idPlace:divisionCode}})
+            .then((res)=>{
+                setDivision(res.data.place[0].placeName)
+                let tempCountry = res.data.place[0].pais
+                let tempCity = res.data.place[0].ciudad
+                
+                axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/idPLace_PlaceName',{params:{idPlace:tempCountry}})
+                .then((res)=>{
+                    setCountry(res.data.placeNames[0]) 
+                    
+                })
+                .catch((error)=>{
+                    console.log(error)
+                })
+
+                axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/idPLace_PlaceName',{params:{idPlace:tempCity}})
+                .then((res)=>{
+                    setCity(res.data.placeNames[0]) 
+                    
+                })
+                .catch((error)=>{
+                    console.log(error)
+                })
+            })
+            .catch((error)=>{
+                console.log(error)
+            })
+        })
+        .catch((error)=>{
+            console.log(error)
+        })
+    }
 
     return (
         <div className={`w-1/5 ${marginLeft}`}>
             <article className="w-full"> 
                 <h1 className="-mt-11 text-lg text-black text-center font-bold"> Segmento #{segmentNumber} </h1>
-
                 <form className="flex flex-col mt-4 px-3 py-6 border-x-4 border-y-4 border-black">
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="airportInput"> Aeropuerto </label>
-                        <select name="airportInput" id="airportInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" onChange={(e)=>setActualAirport(e.target.value)} required>
+                        <select name="airportInput" id="airportInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" onChange={handleAirport} required>
                             <option value="nothing"></option>
-
                             {
                                 segmentAirports.map((element, index) => {
                                     return (<option key={index} value={element}>{element}</option>)
                                 })
                             }
 
-
                         </select>
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="countryInput"> País </label>
-                        <input type="text" name="countryInput" id="countryInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required/>
+                        <input type="text" name="countryInput" id="countryInput" value={country} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled/>
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="cityInput"> Ciudad </label>
-                        <input type="text" name="cityInput" id="cityInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required/>
+                        <input type="text" name="cityInput" id="cityInput" value={city} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled/>
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="divisionInput"> División </label>
-                        <input type="text" name="divisionInput" id="divisionInput" className="w-1/2 px-1 border-x-2 border-y-2 border-black" required/>
+                        <input type="text" name="divisionInput" id="divisionInput" value={division} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled/>
                     </div>
 
                     {(connectionCreated == false) ? (
