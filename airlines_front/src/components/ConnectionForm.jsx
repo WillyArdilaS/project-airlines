@@ -36,7 +36,7 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
     }
 
     return (
-        <article className="w-full mt-16">
+        <article className="w-full mt-20">
             <h1 className="-mt-11 text-lg text-black text-center font-bold"> Conexión #{segmentNumber} </h1>
 
             <form className="flex flex-col mt-4 px-3 py-6 border-x-4 border-y-4 border-black">

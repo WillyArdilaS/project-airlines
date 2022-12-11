@@ -4,7 +4,7 @@ export const Roadmap = () => {
     const location = useLocation();
 
     return (
-        <main className="flex justify-start mt-16 px-6 min-w-max">    
+        <main className="flex justify-start mt-16 mb-8 px-6 min-w-max">    
             <section className="w-1/5 mr-16 min-w-max">
                 <h1 className="-mt-11 mb-2 text-lg text-black text-center font-bold"> Itinerario #1 </h1>
                 <article className="w-full px-8 pt-8 border-x-4 border-y-4 border-black">
