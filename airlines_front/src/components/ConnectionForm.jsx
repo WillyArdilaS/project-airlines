@@ -14,10 +14,6 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
         } 
     }, [airlineCodeConnection])
 
-   
-
-
-
     const handleFlight = (e) => {
         axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
             .then((res) => {
@@ -39,7 +35,6 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
             })
     }
 
-    
     return (
         <article className="w-full mt-16">
             <h1 className="-mt-11 text-lg text-black text-center font-bold"> Conexión #{segmentNumber} </h1>
@@ -54,8 +49,6 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
                                 return (<option key={index} value={element}>{element}</option>)
                             })
                         }
-
-
                     </select>
                 </div>
 
@@ -64,7 +57,7 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
                     <input type="number" name="flight-number" id="flight-number" value={flightNumber} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                 </div>
 
-                <div className="w-full flex justify-between mb-10">
+                <div className="w-full flex justify-between">
                     <label htmlFor="airport-select"> Aeropuerto </label>
                     <input type="text" name="airport-select" id="airport-select" value={actualAirport} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                 </div>

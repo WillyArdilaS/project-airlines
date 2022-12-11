@@ -110,35 +110,33 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
                                     return (<option key={index} value={element}>{element}</option>)
                                 })
                             }
-
                         </select>
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="countryInput"> País </label>
-                        <input type="text" name="countryInput" id="countryInput" value={country} className="w-1/2 px-1 border-x-2 border-y-2 border-black" required  />
+                        <input type="text" name="countryInput" id="countryInput" value={country} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="cityInput"> Ciudad </label>
-                        <input type="text" name="cityInput" id="cityInput" value={city} className="w-1/2 px-1 border-x-2 border-y-2 border-black" required  />
+                        <input type="text" name="cityInput" id="cityInput" value={city} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                     </div>
 
                     <div className="w-full flex justify-between mb-10">
                         <label htmlFor="divisionInput"> División </label>
-                        <input type="text" name="divisionInput" id="divisionInput" value={division} className="w-1/2 px-1 border-x-2 border-y-2 border-black" required />
+                        <input type="text" name="divisionInput" id="divisionInput" value={division} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                     </div>
                     {(connectionCreated == false) ? (
                         <button className="w-3/4 self-center p-2 bg-black text-white font-semibold rounded-full hover:bg-white 
                         hover:text-black border-x-4 border-y-4 border-black transition-colors" onClick={handleCreateConnection}> 
-                        Agregar conexión + </button>
+                        Agregar Conexión + </button>
                     ) : (
                         <button className="w-3/4 self-center p-2 bg-black text-white font-semibold rounded-full hover:bg-white 
                         hover:text-black border-x-4 border-y-4 border-black transition-colors" onClick={handleDeleteConnection}> 
-                        Quitar conexión - </button>
+                        Quitar Conexión - </button>
                     )}               
-                </form>
-                
+                </form>  
             </article>
 
             {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline} num={num}/> : false}
