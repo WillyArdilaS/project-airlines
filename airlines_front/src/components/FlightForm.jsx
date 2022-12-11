@@ -12,6 +12,7 @@ export const FlightForm = () => {
     const [airports, setAirports] = useState([]);
     const [pilots, setPilots] = useState([]);
     const [lastAirline,setLastAirline]= useState("")
+    
 
     useEffect(() => {
         axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas')
@@ -94,6 +95,7 @@ export const FlightForm = () => {
     const handleFlight = (e) => {
         axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
             .then((res) => {
+                
                 let code = res.data.airlineCode
                 axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_flightNumber', { params: { airlineCode: code } })
                     .then((res) => {
@@ -187,7 +189,8 @@ export const FlightForm = () => {
 
             {segmentsArray.map((index) => {
                 return (
-                    <SegmentForm key={index} marginLeft={"ml-32"} segmentNumber={index} airports={airports} airlines={airlines} airlineCode={airlineCode} lastAirline={lastAirline} setLastAirline={setLastAirline}/>
+                    <SegmentForm key={index} marginLeft={"ml-32"} segmentNumber={index} airports={airports} airlines={airlines} airlineCode={airlineCode} lastAirline={lastAirline} setLastAirline={setLastAirline} num={index}/>
+                    
                 );
             })}
         </>

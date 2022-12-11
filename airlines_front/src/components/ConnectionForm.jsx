@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
-export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirport,setLastAirline}) => {
+export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirport,setLastAirline,num}) => {
     const [flightNumber, setFlightNumber] = useState('')
     const [airlineCodeConnection, setAirlineCodeConnection] = useState('')
     
 
     useEffect(() => {
-        console.log(airlineCode)
-        console.log(airlineCodeConnection)
-
         if (airlineCode == airlineCodeConnection) {
-            let newFlightNumber = parseInt(flightNumber)+1
+            let newFlightNumber = parseInt(flightNumber)+num
                 setFlightNumber(newFlightNumber.toString())
-                console.log(flightNumber)
+                
         } 
-
-
     }, [airlineCodeConnection])
 
    
@@ -26,7 +21,8 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
     const handleFlight = (e) => {
         axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
             .then((res) => {
-                let code = res.data.airlineCode
+                console.log(res.data)
+               let code = res.data.airlineCode
                 axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_flightNumber', { params: { airlineCode: code } })
                     .then((res) => {
                         setAirlineCodeConnection(code)
@@ -43,6 +39,7 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
             })
     }
 
+    
     return (
         <article className="w-full mt-16">
             <h1 className="-mt-11 text-lg text-black text-center font-bold"> Conexión #{segmentNumber} </h1>
@@ -64,7 +61,7 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
 
                 <div className="w-full flex justify-between mb-10">
                     <label htmlFor="flight-number"> N° de vuelo </label>
-                    <input type="text" name="flight-number" id="flight-number" value={flightNumber} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
+                    <input type="number" name="flight-number" id="flight-number" value={flightNumber} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                 </div>
 
                 <div className="w-full flex justify-between mb-10">
