@@ -15,9 +15,9 @@ export const FlightForm = () => {
     const [confirmCreate, setConfirmCreate] = useState(false)
     const [lastSegment, setLastSegment] = useState("")
     const [lastJourney, setLastJourney] = useState("")
-    const [originAirport, setOriginAirport] = useState("")
     const [destinyAirport, setDestinyAirport] = useState([])
     const [airportCode, setAirportCode] = useState("")
+   
 
 
 
@@ -31,19 +31,13 @@ export const FlightForm = () => {
             .catch((error) => {
                 console.log(error)
             })
-
-        axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/segmento')
+            axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/segmento')
             .then((res) => {
-                let parse = parseInt(res.data.segmentNumber) + 1
-                console.log(res.data)
+                let parse = parseInt(res.data.segmentNumber)
                 setLastSegment(parse.toString())
             }).catch((error) => {
                 console.log(error)
             })
-            console.log(lastSegment)
-
-
-
         axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/trayecto')
             .then((res) => {
                 let parse = parseInt(res.data.journeyNumber) + 1
@@ -148,7 +142,7 @@ export const FlightForm = () => {
         axios.post('http://localhost:8081/api/insertFlight', { "flightNumber": flightNumber, "airlineCode": airlineCode })
             .then((res) => {
                 alert("vuelo creado")
-                setOriginAirport(airportCode)
+                
             }).catch((error) => {
                 console.log(error)
             })
@@ -168,59 +162,39 @@ export const FlightForm = () => {
             })
 
     }
-
+    //X
     useEffect(() => {
 
         if (confirmCreate == true && destinyAirport.length != 0) {
-
+            let origin = airportCode
             destinyAirport.map((item) => {
-                // console.log(lastSegment)
-                // console.log(airlineCode)
-                // console.log(flightNumber)
-                // console.log(item)
-                // console.log(originAirport)
-                // console.log(lastJourney)
                 axios.post('http://localhost:8081/api/insertFilghtSegment',
                     {
                         flightSegmentId: {
                             idSegment: lastSegment, airlineCode: airlineCode,
                             flightNumber: flightNumber, airportCodeDestino: item
                         },
-                        aiportCodeOrigen: originAirport, idTrayecto: lastJourney
+                        aiportCodeOrigen: origin, idTrayecto: lastJourney
                     })
                     .then((res) => {
-                        setOriginAirport(item)
-                        alert("Segmento creado")
                         axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/segmento')
                             .then((res) => {
-                                let parse = parseInt(res.data.segmentNumber) + 1
+                                let parse = parseInt(res.data.segmentNumber)
                                 setLastSegment(parse.toString())
-                                alert("actualizado")
-                                console.log(lastSegment)
-
                             }).catch((error) => {
                                 console.log(error)
-                            })
+                            })  
                     }).catch((error) => {
                         console.log(error)
                     })
-
-
+                origin = item
             })
             //window.location.reload()    
         }
 
     }, [destinyAirport])
 
-
-
-
-    const updateSegment = () => {
-
-
-    }
-
-
+    
 
 
     return (
@@ -287,7 +261,7 @@ export const FlightForm = () => {
 
                     {segmentsArray.map((index) => {
                         return (
-                            <SegmentForm key={index} marginLeft={"ml-32"} segmentNumber={index} airports={airports} airlines={airlines} airlineCode={airlineCode} lastAirline={lastAirline} setLastAirline={setLastAirline} num={index} confirmCreate={confirmCreate} setDestinyAirport={setDestinyAirport} />
+                            <SegmentForm key={index} marginLeft={"ml-32"} segmentNumber={index} airports={airports} airlines={airlines} airlineCode={airlineCode} lastAirline={lastAirline} setLastAirline={setLastAirline} num={index} confirmCreate={confirmCreate} setDestinyAirport={setDestinyAirport} lastJourney={lastJourney} flightNumber={flightNumber} lastSegment={lastSegment}/>
                         );
                     })}
                 </main>

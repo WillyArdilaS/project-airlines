@@ -2,13 +2,15 @@ import { useState,useEffect } from "react";
 import { ConnectionForm } from "./ConnectionForm";
 import axios from 'axios';
 
-export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline,num,confirmCreate,setDestinyAirport}) => {
+export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline,num,confirmCreate,setDestinyAirport, lastJourney, flightNumber, lastSegment}) => {
     const [connectionCreated, SetConnectionCreated] = useState(false);
     const [actualAirport,setActualAirport]= useState("")
     const [segmentAirports, setSegmentAirports] = useState([]);
     const [division, setDivision] = useState("")
     const [country, setCountry] = useState("")
     const [city, setCity] = useState("")
+    const [airportCode, setAirportCode] = useState("")
+    const [connectionQuery, setConnectionQuery] = useState(false)
     
 
     useEffect(() => {
@@ -95,6 +97,15 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
         .catch((error)=>{
             console.log(error)
         })
+        axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/aiportName_airportCode', { params: { airportName: e.target.value } })
+            .then((res) => {
+
+                setAirportCode(res.data.aiports)
+
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     useEffect(() => {
@@ -163,7 +174,7 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
                 </form>  
             </article>
 
-            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline} num={num} confirmCreate={confirmCreate} /> : false}
+            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline} num={num} confirmCreate={confirmCreate} lastJourney={lastJourney} flightNumber={flightNumber} airportCode={airportCode} lastSegment={lastSegment} connectionQuery={connectionQuery} setConnectionQuery={setConnectionQuery}/> : false}
         </div>
     );
 }

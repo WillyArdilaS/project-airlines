@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
-export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAirport, setLastAirline, num, confirmCreate }) => {
-    const [flightNumber, setFlightNumber] = useState('')
+export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAirport, setLastAirline, num, confirmCreate, lastJourney, flightNumber, airportCode, lastSegment, setConnectionQuery, connectionQuery }) => {
+    const [flightNumberConnection, setFlightNumberConnection] = useState('')
     const [airlineCodeConnection, setAirlineCodeConnection] = useState('')
+
 
 
     useEffect(() => {
         if (airlineCode == airlineCodeConnection) {
-            let newFlightNumber = parseInt(flightNumber) + num
-            setFlightNumber(newFlightNumber.toString())
+            let newFlightNumber = parseInt(flightNumberConnection) + num
+            setFlightNumberConnection(newFlightNumber.toString())
 
         }
     }, [airlineCodeConnection])
@@ -17,14 +18,13 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAir
     const handleFlight = (e) => {
         axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
             .then((res) => {
-                console.log(res.data)
                 let code = res.data.airlineCode
                 axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_flightNumber', { params: { airlineCode: code } })
                     .then((res) => {
                         setAirlineCodeConnection(code)
                         setLastAirline(code)
                         let parse = parseInt(res.data.flightNumber) + 1
-                        setFlightNumber(parse.toString())
+                        setFlightNumberConnection(parse.toString())
                     })
                     .catch((error) => {
                         console.log(error)
@@ -38,21 +38,42 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAir
     useEffect(() => {
         if (confirmCreate == true) {
 
-            console.log('PASO', step)
-            axios.post('http://localhost:8081/api/insertFlight', { flightNumber: flightNumber, airlineCode: airlineCodeConnection })
+            axios.post('http://localhost:8081/api/insertFlight', { flightNumber: flightNumberConnection, airlineCode: airlineCodeConnection })
                 .then((res) => {
-                    alert('Conexión creada')
                 }).catch((error) => {
-
                     console.log(error)
                 })
-            setStep(3)
+            axios.post('http://localhost:8081/api/insertFilghtSegment',
+                {
+                    flightSegmentId: {
+                        idSegment: lastSegment, airlineCode: airlineCodeConnection,
+                        flightNumber: flightNumberConnection, airportCodeDestino: airportCode
+                    },
+                    aiportCodeOrigen: airportCode, idTrayecto: lastJourney
+                })
+                .then((res) => {
+                    alert("Inicia insert conexion")
+                    axios.post('http://localhost:8081/api/insertConnection', {
+                        origenAirlineCode: airlineCode, origenFlightNumber: flightNumber,
+                        origenAirportCodeDestino: airportCode, origenIdSegment: lastSegment, destinoAirlineCode: airlineCodeConnection, destinoFlightNumber: flightNumberConnection,
+                        destinoAirportCode: airportCode, destinoIdSegment: lastSegment
+                    })
+                        .then((res) => {
+                            console.log(res)
+                            alert("Conexion en conexion")
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                }).catch((error) => {
+                    console.log(error)
+                })
+
         }
 
 
+
     }, [confirmCreate])
-
-
 
 
 
@@ -75,7 +96,7 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAir
 
                 <div className="w-full flex justify-between mb-10">
                     <label htmlFor="flight-number"> N° de vuelo </label>
-                    <input type="number" name="flight-number" id="flight-number" value={flightNumber} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
+                    <input type="number" name="flight-number" id="flight-number" value={flightNumberConnection} className="w-1/2 px-1 border-x-2 border-y-2 border-black" disabled />
                 </div>
 
                 <div className="w-full flex justify-between">
