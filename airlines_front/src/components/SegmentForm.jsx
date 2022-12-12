@@ -2,19 +2,17 @@ import { useState,useEffect } from "react";
 import { ConnectionForm } from "./ConnectionForm";
 import axios from 'axios';
 
-export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline,num}) => {
+export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,lastAirline,setLastAirline,num,confirmCreate,setDestinyAirport}) => {
     const [connectionCreated, SetConnectionCreated] = useState(false);
     const [actualAirport,setActualAirport]= useState("")
     const [segmentAirports, setSegmentAirports] = useState([]);
     const [division, setDivision] = useState("")
     const [country, setCountry] = useState("")
     const [city, setCity] = useState("")
-   
-    
     
 
     useEffect(() => {
-        if (airlines.length != 0) {
+        if (airlines.length != 0 && airlineCode!='') {
             axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_idPlace', { params: { airlineCode: lastAirline } })
                 .then((res) => {
                     let codePlace = res.data.idPlace[0]
@@ -47,6 +45,9 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
         }
 
     }, [airlineCode])
+
+    
+    
 
     const handleCreateConnection = (e) => {
         e.preventDefault()
@@ -96,6 +97,29 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
         })
     }
 
+    useEffect(() => {
+        if (confirmCreate == true) {
+
+        axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/aiportName_airportCode',{params:{airportName: actualAirport}})
+        .then((res)=>{
+           
+           setDestinyAirport(dataElement => [...dataElement, res.data.aiports])
+          
+        })
+
+        .catch((error)=>{
+            console.log(error)
+        })
+
+            
+            
+        }
+
+    }, [confirmCreate])
+
+    
+    
+
     return (
         <div className={`w-1/5 ${marginLeft}`}>
             <article className="w-full"> 
@@ -139,7 +163,7 @@ export const SegmentForm = ({marginLeft, segmentNumber,airlines,airlineCode,last
                 </form>  
             </article>
 
-            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline} num={num}/> : false}
+            {(connectionCreated == true) ? <ConnectionForm segmentNumber={segmentNumber} airlines={airlines} airlineCode={airlineCode} actualAirport={actualAirport} setLastAirline={setLastAirline} num={num} confirmCreate={confirmCreate} /> : false}
         </div>
     );
 }

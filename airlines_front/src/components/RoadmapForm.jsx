@@ -1,17 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 export const RoadmapForm = () => {
     const [origin, setOrigin] = useState("");
     const [destiny, setDestiny] = useState("");
     const [hour, setHour] = useState("");
     const [date, setDate] = useState("");
+    const [airportsArray, setAirportsArray] = useState([])
 
     const navigate = useNavigate();
 
     const goToRoadmap = () => {
         navigate("/itinerarios", {state: {origin: origin, destiny: destiny, hour: hour, date: date}});
     }
+
+    useEffect(() => {
+        axios.get('http://localhost:8081/api/aeropuertos')
+        .then((res)=>{
+            console.log(res.data.aiports)
+            res.data.aiports.map((item) =>{
+                setAirportsArray(dataElement => [...dataElement,item.aiportName])
+                console.log(item.aiportName)
+            })
+        }).catch((error)=>{
+            console.log(error)
+        })
+      }
+    , [])
+    
 
     return (
         <main className="flex justify-center mt-16 px-6 min-w-max">    
@@ -22,8 +39,12 @@ export const RoadmapForm = () => {
                             <label htmlFor="originInput"> Origen </label>
                             <select name="originInput" id="originInput" onChange={(e) => setOrigin(e.target.value)} 
                             className="w-1/2 px-1 border-x-2 border-y-2 border-black" required>
-                                <option value=""> 1 </option>
-                                <option value=""> 2 </option>
+                                <option value="nothing"></option>
+                                {
+                                    airportsArray.map((element, index) => {
+                                        return (<option key={index} value={element}>{element}</option>)
+                                    })
+                                } 
                             </select>
                         </div>
                     </form>
@@ -33,8 +54,12 @@ export const RoadmapForm = () => {
                             <label htmlFor="destinyInput"> Destino </label>
                             <select name="destinyInput" id="destinyInput" onChange={(e) => setDestiny(e.target.value)}
                             className="w-1/2 px-1 border-x-2 border-y-2 border-black" required>
-                                <option value=""> 1 </option>
-                                <option value=""> 2 </option>
+                                <option value="nothing"></option>
+                                {
+                                    airportsArray.map((element, index) => {
+                                        return (<option key={index} value={element}>{element}</option>)
+                                    })
+                                } 
                             </select>
                         </div>
                     </form>

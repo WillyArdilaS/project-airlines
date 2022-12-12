@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
-export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirport,setLastAirline,num}) => {
+export const ConnectionForm = ({ segmentNumber, airlines, airlineCode, actualAirport, setLastAirline, num, confirmCreate }) => {
     const [flightNumber, setFlightNumber] = useState('')
     const [airlineCodeConnection, setAirlineCodeConnection] = useState('')
-    
+
 
     useEffect(() => {
         if (airlineCode == airlineCodeConnection) {
-            let newFlightNumber = parseInt(flightNumber)+num
-                setFlightNumber(newFlightNumber.toString())
-                
-        } 
+            let newFlightNumber = parseInt(flightNumber) + num
+            setFlightNumber(newFlightNumber.toString())
+
+        }
     }, [airlineCodeConnection])
 
     const handleFlight = (e) => {
         axios.get(`http://localhost:8081/api/nuevoVuelo/aerolineas/airlineName`, { params: { airlineName: e.target.value } })
             .then((res) => {
                 console.log(res.data)
-               let code = res.data.airlineCode
+                let code = res.data.airlineCode
                 axios.get('http://localhost:8081/api/nuevoVuelo/aerolineas/airlineCode_flightNumber', { params: { airlineCode: code } })
                     .then((res) => {
                         setAirlineCodeConnection(code)
@@ -34,6 +34,27 @@ export const ConnectionForm = ({ segmentNumber, airlines, airlineCode,actualAirp
                 console.log(error)
             })
     }
+
+    useEffect(() => {
+        if (confirmCreate == true) {
+
+            console.log('PASO', step)
+            axios.post('http://localhost:8081/api/insertFlight', { flightNumber: flightNumber, airlineCode: airlineCodeConnection })
+                .then((res) => {
+                    alert('Conexión creada')
+                }).catch((error) => {
+
+                    console.log(error)
+                })
+            setStep(3)
+        }
+
+
+    }, [confirmCreate])
+
+
+
+
 
     return (
         <article className="w-full mt-20">
